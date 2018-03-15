@@ -1,1 +1,4 @@
-# Deep-learning-with-medical-data
+# Machine learning with Medical data 
+-KNN
+-SVM
+-Decision trees
