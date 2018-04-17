@@ -16,6 +16,7 @@ from sklearn.cross_validation import train_test_split
 from sklearn.model_selection import KFold, cross_val_predict, cross_val_score
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn import tree
+import time
 from sklearn.tree import DecisionTreeRegressor
 import matplotlib.pyplot as plt
 import graphviz
@@ -42,11 +43,21 @@ X = onehot_encoder.fit_transform(X)
 sc = StandardScaler()
 X = sc.fit_transform(X)
 
+parameters = {'max_depth':[10, 20]}
+dree = DecisionTreeRegressor(random_state=0)
+reg = GridSearchCV(dree, parameters, scoring ='r2', n_jobs = -1)
+reg.fit(X_train, y_train)
+best_score = reg.best_score_
+best_param = reg.best_params_
+best_model = reg.best_estimator_ #Can use in Cross_val_score & predict
+
 
 """Training and Testing"""
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size = 0.3)
 dree = DecisionTreeRegressor(random_state=0)
+t0 = time.time()
 dree.fit(X_train, y_train)
+print ("training time:", round(time.time()-t0, 3), "s")
 kfold = KFold(n_splits=5, shuffle=False, random_state= None)
 
 score = cross_val_score(estimator = dree, X  = X_train, y = y_train, cv = kfold, scoring='neg_mean_squared_log_error')

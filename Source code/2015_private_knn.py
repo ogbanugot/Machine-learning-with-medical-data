@@ -11,6 +11,7 @@ Nearest Neighbors regression
 #import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import time.time
 from sklearn import neighbors
 from sklearn.model_selection import cross_val_predict
 from sklearn.model_selection import cross_val_score
@@ -24,13 +25,9 @@ from sklearn.model_selection import GridSearchCV
 # Import the dataframe
 # =============================================================================
 
-dataset_train = pd.read_csv('2015_Private.csv')
-
-
-#Features and output for training
-X = dataset_train.iloc[:, [1,3,4,5,6,7]].values #Individually select the  columns
-y = dataset_train.iloc[:, 12].values
-
+dataset = pd.read_csv('2015_Private.csv')
+X = dataset.iloc[:, [2,3,4,5,6,7]].values #Individually select the  columns
+y = dataset.iloc[:, 12].values
 
 # Encoding categorical data
 # Encoding the Independent Variable
@@ -67,8 +64,9 @@ n_neighbors = 10
 weights = "distance"
 kfold = KFold(n_splits=5, shuffle=False, random_state= None)
 knn = neighbors.KNeighborsRegressor(n_neighbors, weights = weights, algorithm='ball_tree', n_jobs =-1)
+t0 = time.time()
 knn.fit(X_train, y_train)
-
+print ("training time:", round(time.time()-t0, 3), "s")
 # =============================================================================
 # #Bagging Ensemble 
 # from sklearn.ensemble import BaggingRegressor
@@ -89,8 +87,10 @@ best_param = reg.best_params_
 best_model = reg.best_estimator_ #Can use in Cross_val_score & predict
 
 #Cross validated estimate on training and test data
-score = cross_val_score(estimator = knn, X  = X_train, y = y_train, cv = kfold, scoring='neg_mean_squared_log_error')
+score = cross_val_score(estimator = knn, X  = X_train, y = y_train, cv = kfold, scoring='r2')
 prediction = cross_val_predict(knn, X_test, y_test, cv= kfold, n_jobs=-1)
+
+
 
 #Variants of scoring
 msle = mean_squared_log_error(y_test, prediction)
@@ -98,7 +98,7 @@ mse = mean_squared_error(y_test,prediction)
 mae = mean_absolute_error(y_test,prediction)
 r2 = r2_score(y_test,prediction)
 from math import sqrt
-sqrt(mse) #root mean --
+rmse = sqrt(mse) #root mean --
 
 #mode Visualization
 plt.plot(y_test, color = 'red', label = 'Real time lapse')
