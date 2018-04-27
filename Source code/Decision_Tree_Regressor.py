@@ -21,6 +21,7 @@ from sklearn.tree import DecisionTreeRegressor
 import matplotlib.pyplot as plt
 import graphviz
 from sklearn.metrics import mean_squared_error, r2_score, mean_squared_log_error, explained_variance_score
+from sklearn.metrics import r2_score
 
 
 hosp_data = pd.read_csv('/Users/ugoslight/Downloads/2015_Private.csv')
@@ -36,7 +37,7 @@ X[:, 4] = le.fit_transform(X[:,4].astype(str))
 
 
 """One hot Encode"""
-onehot_encoder = OneHotEncoder(sparse=False)
+onehot_encoder = OneHotEncoder(sparse=False)s
 X = onehot_encoder.fit_transform(X)
 
 """Feature Scaling"""
@@ -61,7 +62,7 @@ print ("training time:", round(time.time()-t0, 3), "s")
 kfold = KFold(n_splits=5, shuffle=False, random_state= None)
 
 score = cross_val_score(estimator = dree, X  = X_train, y = y_train, cv = kfold, scoring='neg_mean_squared_log_error')
-prediction = cross_val_predict(knn, X_test, y_test, cv= kfold, n_jobs=-1)
+prediction = cross_val_predict(dree, X_test, y_test, cv= kfold, n_jobs=-1)
 y_pred = cross_val_predict(dree, X_test, y_test, cv= kfold, n_jobs=-1)
 """Ensemble - Adaboost"""
 ada_boost = AdaBoostRegressor(DecisionTreeRegressor(max_depth=4), n_estimators=300, random_state=rng)
@@ -72,7 +73,7 @@ ada_boost_predict = ada_boost.predict(X_test)
 expl_variance = explained_variance_score(y_test, y_pred) # 1.0 best, lower worse. 
 msle = mean_squared_log_error(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
-r2_error = r2_score(y_test, y_pred)
+r2_error = r2_score(y_test, prediction)
 
 expl_variance_boost = explained_variance_score(y_test, ada_boost_predict) # 1.0 best, lower worse. 
 msle_boost = mean_squared_log_error(y_test, ada_boost_predict)
